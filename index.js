@@ -22,6 +22,7 @@ for (const file of commandFiles) {
 // Slash command
 client.once('ready', () => {
   console.log(`🤖 Bot listo como ${client.user.tag}`);
+  loadDataFromFirebase();
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -58,6 +59,40 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 });
 
+
+//Firebase
+const axios = require('axios');
+
+async function loadDataFromFirebase() {
+  try {
+    const res = await axios.get(`${process.env.FIREBASE_URL}/grepolis.json`);
+    const data = res.data || {};
+    validPlayers = new Set(data.players || []);
+    validAlliances = new Set(data.alliances || []);
+    console.log("✅ Datos cargados desde Firebase");
+  } catch (err) {
+    console.error("❌ Error al cargar desde Firebase:", err);
+  }
+}
+
+async function saveDataToFirebase() {
+  const data = {
+    players: Array.from(validPlayers),
+    alliances: Array.from(validAlliances)
+  };
+
+  try {
+    await axios.put(`${process.env.FIREBASE_URL}/grepolis.json`, data);
+    console.log("💾 Datos guardados en Firebase");
+  } catch (err) {
+    console.error("❌ Error guardando en Firebase:", err);
+  }
+}
+
+
+
+
+
 // API Express para Tampermonkey
 const express = require('express');
 const cors = require('cors');
@@ -92,7 +127,6 @@ app.post('/report-status', async (req, res) => {
     res.status(500).json({ error: 'Error enviando al canal' });
   }
 });
-
 
 
 app.listen(process.env.PORT || 3000, () => {

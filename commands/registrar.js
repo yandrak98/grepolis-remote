@@ -27,6 +27,8 @@ module.exports = {
       valores.forEach(v => context.validAlliances.add(v.toLowerCase()));
     }
 
+    context.saveDataToFirebase();
+
     return interaction.reply(`✅ ${tipo} registrados: ${valores.join(', ')}`);
   }
 };

@@ -13,13 +13,18 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 
+
 (async () => {
   try {
     console.log('🔁 Actualizando slash commands...');
     await rest.put(
-      Routes.applicationCommands(process.env.CLIENT_ID),
+      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
       { body: commands }
     );
+    await rest.put(
+  Routes.applicationCommands(process.env.CLIENT_ID),
+  { body: [] }
+);
     console.log('✅ Comandos registrados correctamente.');
   } catch (error) {
     console.error(error);

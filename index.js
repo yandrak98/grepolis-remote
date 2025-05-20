@@ -63,12 +63,37 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 app.get('/get-commands', (req, res) => {
   const toSend = [...commandQueue];
   commandQueue.length = 0;
   res.json(toSend);
 });
+
+app.post('/report-status', async (req, res) => {
+  const { message, player, status } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'Falta el campo "message"' });
+  }
+
+  const fullMessage = `📢 **Reporte de Tampermonkey**
+👤 **Jugador**: ${player || 'Desconocido'}
+📋 **Estado**: ${status || 'Sin estado'}
+📝 **Mensaje**: ${message}`;
+
+  try {
+    const channel = await client.channels.fetch(process.env.REPORT_CHANNEL_ID);
+    await channel.send(fullMessage);
+    res.status(200).json({ ok: true });
+  } catch (e) {
+    console.error("❌ Error enviando al canal:", e);
+    res.status(500).json({ error: 'Error enviando al canal' });
+  }
+});
+
+
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('🌐 API Express corriendo');

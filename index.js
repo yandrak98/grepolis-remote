@@ -1,62 +1,154 @@
+const fs = require('fs');
+const path = require('path');
+const { Client, Collection, GatewayIntentBits, Events } = require('discord.js');
 require('dotenv').config();
-const express = require('express');
-const { Client, GatewayIntentBits } = require('discord.js');
-const cors = require('cors');
 
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.commands = new Collection();
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+// Estado compartido
+const commandQueue = [];
+const validPlayers = new Set();
+const validAlliances = new Set();
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.data.name, command);
+}
+
+// Slash command
+client.once('ready', () => {
+  console.log(`🤖 Bot listo como ${client.user.tag}`);
+});
+
+client.on(Events.InteractionCreate, async interaction => {
+  if (interaction.isChatInputCommand()) {
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+
+    try {
+      await command.execute(interaction, { commandQueue, validPlayers, validAlliances });
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({ content: '❌ Ocurrió un error ejecutando el comando.', ephemeral: true });
+    }
+  }
+
+  // Autocomplete
+  if (interaction.isAutocomplete()) {
+    const focused = interaction.options.getFocused(true);
+    let choices = [];
+
+    if (focused.name === 'jugador') {
+      choices = Array.from(validPlayers);
+    } else if (focused.name === 'alianza') {
+      choices = Array.from(validAlliances);
+    }
+
+    const filtered = choices.filter(choice =>
+      choice.toLowerCase().includes(focused.value.toLowerCase())
+    );
+
+    await interaction.respond(
+      filtered.map(choice => ({ name: choice, value: choice })).slice(0, 25)
+    );
+  }
+});
+
+// API Express para Tampermonkey
+const express = require('express');
+const cors = require('cors');
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3000;
-let commandQueue = [];
-
-const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
-});
-
-client.once('ready', () => {
-  console.log(`Bot conectado como ${client.user.tag}`);
-});
-
-client.on('messageCreate', (message) => {
-  if (message.author.bot) return;
-
-  // Comando help
-  if (message.content === '!help') {
-    const helpText = `🛠️ Comandos disponibles:
-- \`!invite "nombreJugador" "alianza"\`: Envía una invitación al jugador especificado.
-- \`!help\`: Muestra esta lista de comandos.`;
-    return message.reply(helpText);
-  }
-
-  // Comando invite con argumentos entre comillas
-  if (message.content.startsWith('!invite ')) {
-    const regex = /^!invite\s+"([^"]+)"\s+"([^"]+)"$/;
-    const match = message.content.match(regex);
-
-    if (!match) {
-      return message.reply('❌ Formato incorrecto. Usa: `!invite "nombreJugador" "alianza"`');
-    }
-
-    const [, nombreJugador, alianza] = match;
-    commandQueue.push({
-      command: "invite",
-      args: [nombreJugador, alianza],
-      timestamp: Date.now()
-    });
-
-    return message.reply(`✅ Invitación registrada: ${nombreJugador} a la alianza "${alianza}"`);
-  }
-});
-
-
 app.get('/get-commands', (req, res) => {
   const toSend = [...commandQueue];
-  commandQueue = [];
+  commandQueue.length = 0;
   res.json(toSend);
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor Express escuchando en el puerto ${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log('🌐 API Express corriendo');
+});
+
+client.login(process.env.BOT_TOKEN);
+const fs = require('fs');
+const path = require('path');
+const { Client, Collection, GatewayIntentBits, Events } = require('discord.js');
+require('dotenv').config();
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.commands = new Collection();
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+// Estado compartido
+const commandQueue = [];
+const validPlayers = new Set();
+const validAlliances = new Set();
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.data.name, command);
+}
+
+// Slash command
+client.once('ready', () => {
+  console.log(`🤖 Bot listo como ${client.user.tag}`);
+});
+
+client.on(Events.InteractionCreate, async interaction => {
+  if (interaction.isChatInputCommand()) {
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+
+    try {
+      await command.execute(interaction, { commandQueue, validPlayers, validAlliances });
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({ content: '❌ Ocurrió un error ejecutando el comando.', ephemeral: true });
+    }
+  }
+
+  // Autocomplete
+  if (interaction.isAutocomplete()) {
+    const focused = interaction.options.getFocused(true);
+    let choices = [];
+
+    if (focused.name === 'jugador') {
+      choices = Array.from(validPlayers);
+    } else if (focused.name === 'alianza') {
+      choices = Array.from(validAlliances);
+    }
+
+    const filtered = choices.filter(choice =>
+      choice.toLowerCase().includes(focused.value.toLowerCase())
+    );
+
+    await interaction.respond(
+      filtered.map(choice => ({ name: choice, value: choice })).slice(0, 25)
+    );
+  }
+});
+
+// API Express para Tampermonkey
+const express = require('express');
+const cors = require('cors');
+const app = express();
+app.use(cors());
+
+app.get('/get-commands', (req, res) => {
+  const toSend = [...commandQueue];
+  commandQueue.length = 0;
+  res.json(toSend);
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('🌐 API Express corriendo');
 });
 
 client.login(process.env.BOT_TOKEN);

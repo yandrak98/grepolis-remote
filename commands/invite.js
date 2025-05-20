@@ -31,10 +31,10 @@ module.exports = {
       return interaction.reply({ content: `❌ Alianza no autorizada: "${alianza}"`, ephemeral: true });
     }
 
-    commandQueue.push({
+
+    context.pushCommandToFirebase({
       command: 'invite',
       args: [jugador, alianza],
-      timestamp: Date.now()
     });
 
     return interaction.reply(`✅ Comando registrado para invitar a ${jugador} en "${alianza}"`);

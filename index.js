@@ -31,7 +31,7 @@ client.on(Events.InteractionCreate, async interaction => {
     if (!command) return;
 
     try {
-      await command.execute(interaction, { commandQueue, validPlayers, validAlliances, saveDataToFirebase });
+      await command.execute(interaction, { commandQueue, validPlayers, validAlliances, saveDataToFirebase, pushCommandToFirebase });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: '❌ Ocurrió un error ejecutando el comando.', ephemeral: true });
@@ -100,7 +100,18 @@ async function saveDataToFirebase() {
 }
 
 
-
+async function pushCommandToFirebase(commandData) {
+  try {
+    const timestamp = Date.now();
+    await axios.put(`${process.env.FIREBASE_URL}/commands/${timestamp}.json`, {
+      ...commandData,
+      timestamp,
+    });
+    console.log("✅ Comando guardado en Firebase:", timestamp);
+  } catch (err) {
+    console.error("❌ Error guardando comando en Firebase:", err);
+  }
+}
 
 
 // API Express para Tampermonkey
@@ -110,10 +121,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/get-commands', (req, res) => {
-  const toSend = [...commandQueue];
-  commandQueue.length = 0;
-  res.json(toSend);
+app.get('/get-commands', async (req, res) => {
+  try {
+    const { data } = await axios.get(`${process.env.FIREBASE_URL}/commands.json`);
+    const allCommands = data || {};
+
+    const result = Object.entries(allCommands).map(([id, cmd]) => ({ id, ...cmd }));
+    res.json(result);
+  } catch (e) {
+    console.error("❌ Error en get-commands:", e);
+    res.status(500).json({ error: "Failed to fetch commands" });
+  }
 });
 
 app.post('/report-status', async (req, res) => {
@@ -137,6 +155,12 @@ app.post('/report-status', async (req, res) => {
     res.status(500).json({ error: 'Error enviando al canal' });
   }
 });
+
+app.post('/completed-command', async (req, res) => {
+  const {comandId} = req.body;
+  
+  await axios.delete(`${process.env.FIREBASE_URL}/commands/${commandId}.json`);
+})
 
 
 app.listen(process.env.PORT || 3000, () => {

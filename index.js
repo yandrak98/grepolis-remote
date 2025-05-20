@@ -157,7 +157,7 @@ app.post('/report-status', async (req, res) => {
 });
 
 app.post('/completed-command', async (req, res) => {
-  const {comandId} = req.body;
+  const {commandId} = req.body;
   
   await axios.delete(`${process.env.FIREBASE_URL}/commands/${commandId}.json`);
 })

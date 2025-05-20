@@ -67,13 +67,23 @@ async function loadDataFromFirebase() {
   try {
     const res = await axios.get(`${process.env.FIREBASE_URL}/grepolis.json`);
     const data = res.data || {};
-    validPlayers = new Set(data.players || []);
-    validAlliances = new Set(data.alliances || []);
+
+    if (data.players) {
+      validPlayers.clear();
+      data.players.forEach(p => validPlayers.add(p));
+    }
+
+    if (data.alliances) {
+      validAlliances.clear();
+      data.alliances.forEach(a => validAlliances.add(a));
+    }
+
     console.log("✅ Datos cargados desde Firebase");
   } catch (err) {
     console.error("❌ Error al cargar desde Firebase:", err);
   }
 }
+
 
 async function saveDataToFirebase() {
   const data = {

@@ -31,7 +31,7 @@ client.on(Events.InteractionCreate, async interaction => {
     if (!command) return;
 
     try {
-      await command.execute(interaction, { commandQueue, validPlayers, validAlliances });
+      await command.execute(interaction, { commandQueue, validPlayers, validAlliances, saveDataToFirebase });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: '❌ Ocurrió un error ejecutando el comando.', ephemeral: true });

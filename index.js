@@ -20,17 +20,34 @@ client.once('ready', () => {
 client.on('messageCreate', (message) => {
   if (message.author.bot) return;
 
-  if (message.content.startsWith('!cmd ')) {
-    const commandText = message.content.slice(5).trim();
-    commandQueue.push({ command: commandText, timestamp: Date.now() });
-    message.reply(`✅ Comando recibido: \`${commandText}\``);
+  // Comando help
+  if (message.content === '!help') {
+    const helpText = `🛠️ Comandos disponibles:
+- \`!invite "nombreJugador" "alianza"\`: Envía una invitación al jugador especificado.
+- \`!help\`: Muestra esta lista de comandos.`;
+    return message.reply(helpText);
   }
 
-  if (message.content === '!comandos') {
-    const helpText = `Comandos disponibles:\n- \`scroll\`\n- \`alerta\`\n- \`recargar\``;
-    message.reply(helpText);
+  // Comando invite con argumentos entre comillas
+  if (message.content.startsWith('!invite ')) {
+    const regex = /^!invite\s+"([^"]+)"\s+"([^"]+)"$/;
+    const match = message.content.match(regex);
+
+    if (!match) {
+      return message.reply('❌ Formato incorrecto. Usa: `!invite "nombreJugador" "alianza"`');
+    }
+
+    const [, nombreJugador, alianza] = match;
+    commandQueue.push({
+      command: "invite",
+      args: [nombreJugador, alianza],
+      timestamp: Date.now()
+    });
+
+    return message.reply(`✅ Invitación registrada: ${nombreJugador} a la alianza "${alianza}"`);
   }
 });
+
 
 app.get('/get-commands', (req, res) => {
   const toSend = [...commandQueue];

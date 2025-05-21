@@ -9,6 +9,7 @@ module.exports = {
     await interaction.reply(`🛠️ Comandos disponibles:
 /invite - Invita a un jugador a una alianza
 /registrar - Añade jugadores o alianzas válidas
+/privis - Añade privilegios a una alianza
 /help - Muestra esta lista`);
   }
 };

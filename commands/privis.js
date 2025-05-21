@@ -10,7 +10,7 @@ module.exports = {
         .setRequired(true)
         .setAutocomplete(true)),
 
-  async execute(interaction) {
+  async execute(interaction, context) {
     const alianza = interaction.options.getString('alianza');
     const validAlliances = context.validAlliances;
 

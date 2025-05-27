@@ -10,6 +10,7 @@ module.exports = {
 /invite - Invita a un jugador a una alianza
 /registrar - Añade jugadores o alianzas válidas
 /privis - Añade privilegios a una alianza
-/help - Muestra esta lista`);
+/help - Muestra esta lista
+/reset - Reinicia las cuentas para invitar. SOLO utilizar en caso de error persistente (invitaciones no enviadas).`);
   }
 };

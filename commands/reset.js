@@ -6,7 +6,6 @@ module.exports = {
     .setDescription('Reinicia las cuentas en caso de fallo.'),
 
   async execute(interaction) {
-    await interaction.reply(`🛠️ Comando registrado para reiniciar las cuentas.`);
         // Envía la solicitud al webhook
     const webhookURL = 'https://hook.pablaken.com/hooks/restart'; // Reemplaza con tu URL real
 

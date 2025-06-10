@@ -216,3 +216,16 @@ process.on('unhandledRejection', (reason, promise) => {
 app.get('/', (req, res) => {
   res.send('OK');
 });
+
+const WebSocket = require('ws');
+
+const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
+
+ws.on('open', () => {
+  console.log('✅ WebSocket connected to Discord Gateway!');
+  ws.close();
+});
+
+ws.on('error', (err) => {
+  console.error('❌ WebSocket error:', err);
+});

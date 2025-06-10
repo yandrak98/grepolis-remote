@@ -187,6 +187,10 @@ client.once('ready', () => {
     console.log(`🤖 Bot listo como ${client.user.tag}`);
   });
 
+client.on(Events.ClientReady, () => {
+  console.log(`🤖 Bot listo como ${client.user.tag}`);
+});
+
 client.on('error', error => {
   console.error("❌ Cliente Discord error:", error);
 });
@@ -201,6 +205,10 @@ client.on('warn', msg => {
 
 client.on('error', err => {
   console.error('❌ Cliente Discord error:', err);
+});
+
+client.on('invalidated', () => {
+  console.error('🛑 Sesión invalidada');
 });
 
 process.on('uncaughtException', (err) => {

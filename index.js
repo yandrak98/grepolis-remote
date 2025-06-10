@@ -19,12 +19,6 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command);
 }
 
-// Slash command
-client.once('ready', () => {
-  console.log(`🤖 Bot listo como ${client.user.tag}`);
-  loadDataFromFirebase();
-});
-
 client.on(Events.InteractionCreate, async interaction => {
   if (interaction.isChatInputCommand()) {
     const command = client.commands.get(interaction.commandName);
@@ -167,4 +161,25 @@ app.listen(process.env.PORT || 3000, () => {
   console.log('🌐 API Express corriendo');
 });
 
-client.login(process.env.BOT_TOKEN);
+process.on('unhandledRejection', err => {
+  console.error('⚠️ Unhandled Rejection:', err);
+});
+
+async function startBot() {
+  console.log("🔄 Cargando datos desde Firebase...");
+  await loadDataFromFirebase();
+  console.log("✅ Datos iniciales cargados. Iniciando bot...");
+
+  client.once('ready', () => {
+    console.log(`🤖 Bot listo como ${client.user.tag}`);
+  });
+
+  try {
+    await client.login(process.env.BOT_TOKEN);
+  } catch (err) {
+    console.error("❌ Error iniciando sesión con el bot:", err);
+  }
+}
+
+// Ejecutar el inicio
+startBot();

@@ -3,7 +3,14 @@ const path = require('path');
 const { Client, Collection, GatewayIntentBits, Events } = require('discord.js');
 require('dotenv').config();
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent, // si usás contenido de mensajes
+  ]
+});
+
 
 client.commands = new Collection();
 
@@ -170,10 +177,6 @@ async function startBot() {
   await loadDataFromFirebase();
   console.log("✅ Datos iniciales cargados. Iniciando bot...");
 
-  client.once('ready', () => {
-    console.log(`🤖 Bot listo como ${client.user.tag}`);
-  });
-
   try {
     await client.login(process.env.BOT_TOKEN);
     console.log("✅ Sesión iniciada correctamente");
@@ -181,6 +184,10 @@ async function startBot() {
     console.error("❌ Error iniciando sesión con el bot:", err);
   }
 }
+
+client.once('ready', () => {
+    console.log(`🤖 Bot listo como ${client.user.tag}`);
+  });
 
 client.on('error', error => {
   console.error("❌ Cliente Discord error:", error);

@@ -177,12 +177,9 @@ async function startBot() {
   await loadDataFromFirebase();
   console.log("✅ Datos iniciales cargados. Iniciando bot...");
 
-  try {
-    await client.login(process.env.BOT_TOKEN);
-    console.log("✅ Sesión iniciada correctamente");
-  } catch (err) {
-    console.error("❌ Error iniciando sesión con el bot:", err);
-  }
+  client.login(process.env.BOT_TOKEN)
+  .then(() => console.log("✅ Login exitoso"))
+  .catch(err => console.error("❌ Error en login:", err));
 }
 
 client.once('ready', () => {
@@ -195,10 +192,6 @@ client.on('error', error => {
 
 client.on('shardError', error => {
   console.error('❌ WebSocket error en shard:', error);
-});
-
-client.on('debug', msg => {
-  console.log('🪵 DEBUG:', msg);
 });
 
 client.on('warn', msg => {

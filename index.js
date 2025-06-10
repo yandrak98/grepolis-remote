@@ -186,9 +186,6 @@ client.on('error', error => {
   console.error("❌ Cliente Discord error:", error);
 });
 
-// Ejecutar el inicio
-startBot();
-
 client.on('shardError', error => {
   console.error('❌ WebSocket error en shard:', error);
 });
@@ -219,13 +216,31 @@ app.get('/', (req, res) => {
 
 const WebSocket = require('ws');
 
-const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
+async function testDiscordWebSocket() {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
 
-ws.on('open', () => {
-  console.log('✅ WebSocket connected to Discord Gateway!');
-  ws.close();
-});
+    ws.on('open', () => {
+      console.log('✅ WebSocket connected to Discord Gateway!');
+      ws.close();
+      resolve();
+    });
 
-ws.on('error', (err) => {
-  console.error('❌ WebSocket error:', err);
-});
+    ws.on('error', (err) => {
+      console.error('❌ WebSocket error:', err);
+      reject(err);
+    });
+  });
+}
+
+(async () => {
+  try {
+    await testDiscordWebSocket();
+    
+    // Ejecutar el inicio
+    startBot();
+  } catch (e) {
+    console.error('Error conectando al WebSocket antes de iniciar bot:', e);
+    process.exit(1);  // Sale para que Render lo detecte y pueda reiniciar
+  }
+})();

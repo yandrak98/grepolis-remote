@@ -193,10 +193,6 @@ client.on('shardError', error => {
   console.error('❌ WebSocket error en shard:', error);
 });
 
-client.on('debug', msg => {
-  console.log('🪵 DEBUG:', msg);
-});
-
 client.on('warn', msg => {
   console.warn('⚠️ WARN:', msg);
 });

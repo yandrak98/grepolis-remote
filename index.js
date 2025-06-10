@@ -176,10 +176,15 @@ async function startBot() {
 
   try {
     await client.login(process.env.BOT_TOKEN);
+    console.log("✅ Sesión iniciada correctamente");
   } catch (err) {
     console.error("❌ Error iniciando sesión con el bot:", err);
   }
 }
+
+client.on('error', error => {
+  console.error("❌ Cliente Discord error:", error);
+});
 
 // Ejecutar el inicio
 startBot();

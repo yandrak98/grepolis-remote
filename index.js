@@ -187,8 +187,8 @@ client.once('ready', () => {
     console.log(`🤖 Bot listo como ${client.user.tag}`);
   });
 
-client.on(Events.ClientReady, () => {
-  console.log(`🤖 Bot listo como ${client.user.tag}`);
+client.ws.on('debug', (info) => {
+  console.log('🪵 DEBUG:', info);
 });
 
 client.on('error', error => {

@@ -165,19 +165,6 @@ process.on('unhandledRejection', err => {
   console.error('⚠️ Unhandled Rejection:', err);
 });
 
-const WebSocket = require('ws');
-
-const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
-
-ws.on('open', () => {
-  console.log('✅ WebSocket connected to Discord Gateway!');
-  ws.close();
-});
-
-ws.on('error', (err) => {
-  console.error('❌ WebSocket error:', err);
-});
-
 async function startBot() {
   console.log("🔄 Cargando datos desde Firebase...");
   await loadDataFromFirebase();

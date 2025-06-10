@@ -188,3 +188,19 @@ client.on('error', error => {
 
 // Ejecutar el inicio
 startBot();
+
+client.on('shardError', error => {
+  console.error('❌ WebSocket error en shard:', error);
+});
+
+client.on('debug', msg => {
+  console.log('🪵 DEBUG:', msg);
+});
+
+client.on('warn', msg => {
+  console.warn('⚠️ WARN:', msg);
+});
+
+client.on('error', err => {
+  console.error('❌ Cliente Discord error:', err);
+});

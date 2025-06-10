@@ -220,34 +220,6 @@ process.on('unhandledRejection', (reason, promise) => {
 app.get('/', (req, res) => {
   res.send('OK');
 });
-
-const WebSocket = require('ws');
-
-async function testDiscordWebSocket() {
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
-
-    ws.on('open', () => {
-      console.log('✅ WebSocket connected to Discord Gateway!');
-      ws.close();
-      resolve();
-    });
-
-    ws.on('error', (err) => {
-      console.error('❌ WebSocket error:', err);
-      reject(err);
-    });
-  });
-}
-
-(async () => {
-  try {
-    await testDiscordWebSocket();
-    
-    // Ejecutar el inicio
-    startBot();
-  } catch (e) {
-    console.error('Error conectando al WebSocket antes de iniciar bot:', e);
-    process.exit(1);  // Sale para que Render lo detecte y pueda reiniciar
-  }
-})();
+   
+  // Ejecutar el inicio
+  startBot();

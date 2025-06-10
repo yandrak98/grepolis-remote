@@ -193,6 +193,10 @@ client.on('shardError', error => {
   console.error('❌ WebSocket error en shard:', error);
 });
 
+client.on('debug', msg => {
+  console.log('🪵 DEBUG:', msg);
+});
+
 client.on('warn', msg => {
   console.warn('⚠️ WARN:', msg);
 });
@@ -211,4 +215,17 @@ process.on('unhandledRejection', (reason, promise) => {
 
 app.get('/', (req, res) => {
   res.send('OK');
+});
+
+const WebSocket = require('ws');
+
+const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
+
+ws.on('open', () => {
+  console.log('✅ WebSocket connected to Discord Gateway!');
+  ws.close();
+});
+
+ws.on('error', (err) => {
+  console.error('❌ WebSocket error:', err);
 });

@@ -7,6 +7,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.MessageContent, // si usás contenido de mensajes
   ]
 });
@@ -214,21 +215,5 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
    
-  // Ejecutar el inicio
-  startBot();
-
-  const WebSocket = require('ws');
-
-  const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
-
-  ws.on('open', () => {
-    console.log('✅ WebSocket abierto');
-  });
-
-  ws.on('message', (data) => {
-    console.log('📨 Mensaje del gateway:', data.toString());
-  });
-
-  ws.on('error', (err) => {
-    console.error('❌ Error:', err);
-  });
+// Ejecutar el inicio
+startBot();
